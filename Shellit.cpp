@@ -1,6 +1,6 @@
 /*
 This is a basic shellcode launcher that is leveraging the ability of the Windows API function CallWindowProcA.
-Whatever code is supplied in the memory region of the first parameter will be executed.  
+Whatever code is supplied in the memory region of the first parameter will be executed.
 The other parameters can be used to pass arguments to the called shellcode. They will be available on the stack just like a normal call.
 
 Example of passing params to CallWindowProcA.
@@ -27,12 +27,13 @@ int main()
 	DWORD shellSize = 0;
 	std::string shellName;
 	char anotherFile;
+	char hold;
 
 	printf("What is the name of the Shellcode file? ");
 	std::cin >> shellName;
 
 	printf("Do you need to enter another file as a parameter? (y/n) ");
-	std::cin >> anotherFile;
+	scanf_s(" %c", &anotherFile,2);
 
 	if (tolower(anotherFile) == 'y') {
 
@@ -42,7 +43,7 @@ int main()
 		printf("What is the name of the param file? ");
 		std::cin >> paramFile;
 
-		
+
 		printf("[+] Opening Shellcode File: %s\n", shellName.c_str());
 		printf("[+] Opening Ecrypted File: %s\n", paramFile.c_str());
 
@@ -122,17 +123,16 @@ int main()
 		printf("[+] Pausing right before shell execution.  If needed, now would be the time to:\n");
 		printf("   [+] Attach to this proess with x32dbg and set a bp on the shell memory region.\n");
 		printf("   [+] Check allocted memory region contents with process hacker.\n");
-		printf("[+] Press a key to continue...\n");
-		getchar();
+		printf("[+] Enter any char and press enter to continue...\n");
+		scanf_s(" %s", &hold, 2);
 
 
-		printf("[+] Executing shellcode using CallWindowProc and passing Encrypted code as arg.\n");
+		printf("[+] Executing shellcode using CallWindowProc and passing param file as arg.\n");
 		printf("[+] Hold on to your butts...\n");
 
 		ret = CallWindowProcA((WNDPROC)pShellcode, (HWND)pEncCode, 0, 0, 0);
 
 		printf("[+] Shellcode executed!\n");
-		getchar(); // Keep shellcode running
 		return ret;
 
 	}
@@ -140,14 +140,14 @@ int main()
 		printf("[+] Opening Shellcode File: %s\n", shellName.c_str());
 
 		HANDLE shellFile = CreateFileA(shellName.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		
+
 		if (shellFile == INVALID_HANDLE_VALUE)
 		{
 			err = GetLastError();
 			printf("[-] ERROR: Unable to open file. Error %i\n", err);
 			return 0;
 		}
-		
+
 		shellSize = GetFileSize(shellFile, NULL);
 
 		if (shellSize == INVALID_FILE_SIZE)
@@ -184,8 +184,8 @@ int main()
 		printf("[+] Pausing right before shell execution.  If needed, now would be the time to:\n");
 		printf("   [+] Attach to this proess with x32dbg and set a bp on the shell memory region.\n");
 		printf("   [+] Check allocted memory region contents with process hacker.\n");
-		printf("[+] Press a key to continue...\n");
-		getchar();
+		printf("[+] Enter any char and press enter to continue...\n");
+		scanf_s(" %s", &hold, 2);
 
 
 		printf("[+] Executing shellcode using CallWindowProc...\n");
@@ -194,7 +194,6 @@ int main()
 		ret = CallWindowProcA((WNDPROC)pShellcode, 0, 0, 0, 0);
 
 		printf("[+] Shellcode executed!\n");
-		getchar(); // Keep shellcode running
 		return ret;
 	}
 }
